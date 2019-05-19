@@ -45,8 +45,8 @@ def main():
     showNothing = [False]
     showIndex = [0] #default showBest
 
-    numGames = 25 #This is the number of sets of players
-    pop = Population(numGames, screen)
+    numGames = 1 #This is the number of sets of players
+    pop = Evolution(numGames, screen)
 
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
@@ -73,7 +73,7 @@ def main():
             # Update items in the level
             for game in pop.games:
                 game.level.update()
-                game.updateAllHealth()
+                # game.updateAllHealth()
 
             pop.draw(showNothing[0],showIndex[0])
 
@@ -87,33 +87,33 @@ def main():
             
             #Display our game stats on the screen
             if not showNothing[0]:
-                timemsg = str(int(timeremaining/FRAMERATE))
-                gameUI.displayText(screen, timemsg,388,110,140,20, BLUE)
+                # timemsg = str(int(timeremaining/FRAMERATE))
+                # gameUI.displayText(screen, timemsg,388,110,140,20, BLUE)
 
-                if showIndex == -1: #showAll
-                    numGoalsMsg = str(pop.games[0].player.numGoals - pop.games[0].enemy.numGoals)
-                else: #use index - show only that game
-                    numGoalsMsg = str(pop.games[showIndex[0]].player.numGoals - pop.games[showIndex[0]].enemy.numGoals)
+                # if showIndex == -1: #showAll
+                #     numGoalsMsg = str(pop.games[0].player.numGoals - pop.games[0].enemy.numGoals)
+                # else: #use index - show only that game
+                #     numGoalsMsg = str(pop.games[showIndex[0]].player.numGoals - pop.games[showIndex[0]].enemy.numGoals)
                     
-                gameUI.displayText(screen, numGoalsMsg, 388, 175, 120, 20, False)
+                # gameUI.displayText(screen, numGoalsMsg, 388, 175, 120, 20, False)
 
                 
-                genMsg = "Gen: " + str(pop.gen)
+                # genMsg = "Gen: " + str(pop.gen)
                 pygame.draw.rect(screen, BLACK,(1200,550,100,50))
-                gameUI.displayText(screen, genMsg, 1200, 550, 100, 25, False)
+                # gameUI.displayText(screen, genMsg, 1200, 550, 100, 25, False)
 
-                if pop.bestScore != -1000:
-                    genMsg = "Hi Score: " + str(int(pop.bestScore))
-                    pygame.draw.rect(screen, BLACK,(810,550,300,50))
-                    gameUI.displayText(screen, genMsg, 810, 550, 100, 25, False)
+                # if pop.bestScore != -1000:
+                #     genMsg = "Hi Score: " + str(int(pop.bestScore))
+                #     pygame.draw.rect(screen, BLACK,(810,550,300,50))
+                #     gameUI.displayText(screen, genMsg, 810, 550, 100, 25, False)
 
             # Limit to 60 frames per second
             clock.tick(FRAMERATE)
 
             if timeremaining <= 0:
                 for game in pop.games:
-                    game.player.respawn()
-                    game.enemy.respawn()
+                    # game.player.respawn()
+                    # game.enemy.respawn()
                     game.player.calculateFitness()
                     print("Fitness: " + str(game.player.fitness))
                     gameUI.done = True
@@ -131,7 +131,7 @@ def main():
 class Interface():
     def __init__(self, screen, numGames):
         self.screen = screen
-        self.numGames = numGames
+        # self.numGames = numGames
         self.satisfied = False
         self.done = False
         self.buttonsDrawn = False

@@ -1,82 +1,63 @@
 from Player import *
 from Game import *
-from Species import *
+# from Species import *
 import math
 
-class Population():
+class Evolution():
 
    #construct the population
     def __init__(self,size, screen):
         self.games = []
-        #self.bestPlayer = None
-        self.bestScore = -1000
-        self.gen = 0
+        self.bestScore = 0
         self.innovationHistory = []
-        #self.genPlayers = []
-        self.species = []
+
+        #change based on number of champs
+        self.champions = []
+
+        self.gen = 0
         self.screen = screen
+        self.averageFitness = 0
+        self.fitnessHistory = []
 
-        self.massExtinctionEvent = False
-        self.newStage = False
-        self.populationLife = 0
-
-        #Add the brains to each player
+        #Create the initial games
         for i in range(size):
             self.games.append(Game(screen))
+            # generate their brains
             self.games[i].player.brain.generateNetwork()
-            #Mutate those brains
+            # mutate their brains
             self.games[i].player.brain.mutate(self.innovationHistory)
-            self.games[i].player.brain.mutate(self.innovationHistory)
-
-    #sets the best player globally and for this gen
-    def setBestPlayer(self):
-        # tempBest = self.games[0]
-        # tempBest.gen = self.gen
-        # for game in self.games:
-        #     if game.player.fitness > tempBest.player.fitness:
-        #         tempBest = game
-        # if tempBest.player.fitness > self.bestScore:
-        #     #self.genPlayers.append(tempBest.player.clone())
-        #     print("old best:", self.bestScore,"\n")
-        #     print("new best:", tempBest.player.fitness,"\n")
-        self.bestScore = self.species[0].bestFitness
-            #self.bestPlayer = tempBest.player.clone()
 
     # this function is called when all the players in the population are dead and a new generation needs to be made
     def naturalSelection(self):
-        self.calculateFitness() #calculate the fitness of each player
-        self.speciate() #seperate the population into species 
-        self.sortSpecies() #sort the species to be ranked in fitness order, best first
-        if self.massExtinctionEvent:
-            self.massExtinction()
-            self.massExtinctionEvent = False
+        """ 
+        Here we calculate our fitness of our last generation and create
+        a new generation from (most) of their ashes. 
+            - 5% of the best players stick around (champs)
+            - 25% of the best players get mutated (mutants)
+            - 70% of the players are babies from the top 50%
+        """
 
-        self.cullSpecies() # kill off the bottom half of each species
-        self.setBestPlayer() # save the best player of this gen
-        self.killStaleSpecies() # remove species which haven't improved in the last 15(ish) generations
-        self.killBadSpecies() # kill species which are so bad that they cant reproduce
-        
-        print("generation", self.gen, "Number of mutations", len(self.innovationHistory), 
-            "species: ", len(self.species), "<<<<<\n")
-        
-        self.calculateFitness() #calculate the fitness of each player
-        averageSum = self.getAvgFitnessSum()
+        self.calculateFitness() # calculate the fitness of each player
+        self.merge_sort(self.games) # sort the species to be ranked in fitness order, best first
+        self.updateAverageFitness() # just book keeping
+
+
+        #Begin creating the next generation of players
         children = [] #the next generation
 
-        print("Species:\n")              
-        for species in self.species: #for each species
-            print("best unadjusted fitness:", species.bestFitness)
-            for i in range(len(species.players)):
-                print("player ", i, "fitness: ", species.players[i].fitness, ' ')
-            print("\n")
-            children.append(species.champ.clone()) #add champion without any mutation
-            NoOfChildren = math.floor(species.averageFitness / averageSum * len(self.games)) -1 # the number of children this species is allowed, note -1 is because the champ is already added
-            for i in range(NoOfChildren): #get the calculated amount of children from this species
-                children.append(species.giveMeBaby(self.innovationHistory))
-            
-        while len(children) < len(self.games): #if not enough babies (due to flooring the number of children to get a whole int) 
-            children.append(self.species[0].giveMeBaby(self.innovationHistory)) #get babies from the best species
+        #carry over the best 5% of players --> accounts for 5% of new generation
+        self.updateChampions() # saves the top 5 players per generation
+        children.extend(self.champions)
+        
+        # Create children from the old generation
+        for i in range(len(self.games) - len(self.champions)): #get the calculated amount of children from this species
+            children.append(self.giveMeBaby(self.innovationHistory))
+            # create a new child
 
+        while len(children) < len(self.games): #if not enough babies (due to flooring the number of children to get a whole int) 
+            children.append(self.giveMeBaby(self.innovationHistory)) #get babies from the best species
+
+        # clear all of the games
         self.games.clear()
 
         for child in children: #set the children as the current population
@@ -84,73 +65,66 @@ class Population():
 
         self.resetFitness()
         self.gen += 1
+
         # for game in self.games: # generate networks for each of the children
         #     game.player.brain.generateNetwork()
+        #sets the best player globally and for this gen
 
-    #seperate population into species based on how similar they are to the leaders of each species in the previous gen
-    def speciate(self):
-        for s in self.species: #empty species
-            s.players.clear()
-        for game in self.games: # for each player
-            speciesFound = False
-            for s in self.species: # for each species
-                if s.sameSpecies(game.player.brain): # if the player is similar enough to be considered in the same species
-                    s.addToSpecies(game.player) # add it to the species
-                    speciesFound = True
-                    break
-            if not speciesFound: # if no species was similar enough then add a new species with this as its champion
-                self.species.append(Species(game.player))
+    def updateChampions(self):
+        tempChamps = []
+        for i in range(0, math.ceil(len(self.games)* .05)):
+            tempChamps.append(games[i])
+        self.champions = tempChamps
 
     #calculates the fitness of all of the players 
     def calculateFitness(self):
         for game in self.games:
             game.player.calculateFitness()
 
-    #sorts the players within a species and the species by their fitnesses
-    def sortSpecies(self):
-        # sort the players within a species
-        for s in self.species:
-            s.sortSpecies()
-        self.species = self.merge_sort(self.species)
-
-    #kills all species which haven't improved in 15 generations
-    def killStaleSpecies(self):
-        i = 2
-        while i < len(self.species):
-            if self.species[i].staleness >= 15:
-                self.species.pop(i)
+  # gets baby from the players in the generation
+    def giveMeBaby(self, innovationHistory):
+        baby = None
+        if random.uniform(0,1) < 0.25: # 25% of the time there is no crossover and the child is simply a clone of a random(ish) player
+            baby = self.selectPlayer().clone()
+        else: # 75% of the time do crossover 
+            # get 2 random(ish) parents 
+            parent1 = self.selectPlayer()
+            parent2 = self.selectPlayer()
+            
+            #the crossover function expects the highest fitness parent to be the object and the lowest as the argument
+            if parent1.fitness < parent2.fitness:
+                baby = parent2.crossover(parent1)
             else:
-                i += 1
+                baby =  parent1.crossover(parent2)
+        baby.brain.mutate(innovationHistory) # mutate the baby brain
+        return baby
 
-    #if a species sucks so much that it wont even be allocated 1 child for the next generation then kill it now
-    def killBadSpecies(self):
-        averageSum = self.getAvgFitnessSum()
-        i = 0
-        while i < len(self.species):
-            if self.species[i].averageFitness / averageSum * len(self.games) < 1: #if wont be given a single child 
-                self.species.pop(i) # sad
-            else: 
-                i += 1
+    def selectPlayer(self):
+        fitnessSum = 0.0
+        for game in self.games:
+            fitnessSum += abs(game.player.fitness)
+        
+        rand = random.uniform(0,fitnessSum)
+        runningSum = 0.0
+
+        for i in range(len(self.games)):
+            runningSum += abs(self.games[i].player.fitness)
+            if runningSum > rand:
+                return self.games[i].players
+
+        # unreachable code to make the parser happy
+        #print("Oops - something went wrong. This species has", str(len(self.players)), "players but it should have more.")
+        return self.games[0].player
 
     # returns the sum of each species average fitness
     def getAvgFitnessSum(self):
         averageSum = 0
-        for s in self.species:
-            averageSum += s.averageFitness
+        for game in self.games:
+            averageSum += game.player.fitness
+        averageSum = float( averageSum  / len(self.games))
+        self.fitnessHistory.append(averageSum)
         return averageSum
 
-    # kill the bottom half of each species
-    def cullSpecies(self):
-        for s in self.species:
-            s.cull() # kill bottom half
-            s.fitnessSharing() # also while we're at it lets do fitness sharing
-            s.setAverage() # reset averages because they will have changed
-
-    def massExtinction(self):
-        for i in range(5, len(self.species)):
-                self.species.pop(i) #sad
-                i -= 1
-    
     def draw(self, showNothing, showIndex):
         if not showNothing:
             if showIndex == -1: #showAll

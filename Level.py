@@ -50,14 +50,14 @@ class Level(object):
         self.active_sprite_list = pygame.sprite.Group()
         self.platform_list = pygame.sprite.Group()
         self.player_list = pygame.sprite.Group()
-        self.enemy_list = pygame.sprite.Group()
+        # self.enemy_list = pygame.sprite.Group()
         self.player = player
-        self.player_attack_list = pygame.sprite.Group()
-        self.enemy_attack_list = pygame.sprite.Group()
+        # self.player_attack_list = pygame.sprite.Group()
+        # self.enemy_attack_list = pygame.sprite.Group()
         self.screen = screen
 
         self.playerdirection = "right"
-        self.enemydirection = "left"
+        # self.enemydirection = "left"
         self.currentmap = -1
          
         # Background image
@@ -69,9 +69,9 @@ class Level(object):
         self.active_sprite_list.update()
         self.platform_list.update()
         self.player_list.update()
-        self.player_attack_list.update()
-        self.enemy_list.update()
-        self.enemy_attack_list.update()
+        # self.player_attack_list.update()
+        # self.enemy_list.update()
+        # self.enemy_attack_list.update()
  
     #Draws all of the sprite lists 
     def draw(self, game):
@@ -91,9 +91,9 @@ class Level(object):
             self.enemydirection = game.enemy.direction
 
         self.player_attack_list.draw(self.screen) 
-        self.enemy_attack_list.draw(self.screen) 
+        # self.enemy_attack_list.draw(self.screen) 
         self.platform_list.draw(self.screen)
-        self.enemy_list.draw(self.screen)
+        # self.enemy_list.draw(self.screen)
         self.player_list.draw(self.screen)
         self.screen.blit(NeuralNetBG, (800,50))
         

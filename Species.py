@@ -87,43 +87,46 @@ class Species():
         #else:
             #print("Oops - something went wrong. This species has", str(len(self.players)), "players but it should have more.")
 
-    # gets baby from the players in this species
-    def giveMeBaby(self, innovationHistory):
-        baby = None
-        if random.uniform(0,1) < 0.15: # 25% of the time there is no crossover and the child is simply a clone of a random(ish) player
-            baby = self.selectPlayer().clone()
-        else: # 75% of the time do crossover 
-            # get 2 random(ish) parents 
-            parent1 = self.selectPlayer()
-            parent2 = self.selectPlayer()
+
+"""NOW IN POP"""
+    # # gets baby from the players in this species
+    # def giveMeBaby(self, innovationHistory):
+    #     baby = None
+    #     if random.uniform(0,1) < 0.15: # 25% of the time there is no crossover and the child is simply a clone of a random(ish) player
+    #         baby = self.selectPlayer().clone()
+    #     else: # 75% of the time do crossover 
+    #         # get 2 random(ish) parents 
+    #         parent1 = self.selectPlayer()
+    #         parent2 = self.selectPlayer()
             
-            #the crossover function expects the highest fitness parent to be the object and the lowest as the argument
-            if parent1.fitness < parent2.fitness:
-                baby = parent2.crossover(parent1)
-            else:
-                baby =  parent1.crossover(parent2)
-        baby.brain.mutate(innovationHistory) # mutate the baby brain
-        return baby
+    #         #the crossover function expects the highest fitness parent to be the object and the lowest as the argument
+    #         if parent1.fitness < parent2.fitness:
+    #             baby = parent2.crossover(parent1)
+    #         else:
+    #             baby =  parent1.crossover(parent2)
+    #     baby.brain.mutate(innovationHistory) # mutate the baby brain
+    #     return baby
 
-    # selects a player based on it fitness
-    def selectPlayer(self):
-        fitnessSum = 0.0
-        for player in self.players:
-            fitnessSum += abs(player.fitness)
+    # # selects a player based on it fitness
+    # def selectPlayer(self):
+    #     fitnessSum = 0.0
+    #     for player in self.players:
+    #         fitnessSum += abs(player.fitness)
         
-        rand = random.uniform(0,fitnessSum)
-        runningSum = 0.0
+    #     rand = random.uniform(0,fitnessSum)
+    #     runningSum = 0.0
 
-        for i in range(len(self.players)):
-            runningSum += abs(self.players[i].fitness)
-            if runningSum > rand:
-                return self.players[i]
+    #     for i in range(len(self.players)):
+    #         runningSum += abs(self.players[i].fitness)
+    #         if runningSum > rand:
+    #             return self.players[i]
 
-        # unreachable code to make the parser happy
-        #print("Oops - something went wrong. This species has", str(len(self.players)), "players but it should have more.")
-        return self.players[0]
+    #     # unreachable code to make the parser happy
+    #     #print("Oops - something went wrong. This species has", str(len(self.players)), "players but it should have more.")
+    #     return self.players[0]
 
     #kills off bottom half of the species
+    
     def cull(self):
         if len(self.players) > 2:
             i = int(len(self.players)/2)

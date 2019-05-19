@@ -40,7 +40,7 @@ class Player(pygame.sprite.Sprite):
         # self.respawnDelay = 30 #Don't redraw the player upon death for 30 frames
 
         self.direction = "right"
-        # self.image = pygame.image.load('Images/playerrightangry.png')
+        self.image = pygame.image.load('Images/playerrightangry.png')
 
         # So our player can modify the overall screen
         self.screen = screen
@@ -63,8 +63,8 @@ class Player(pygame.sprite.Sprite):
         # List of sprites we can bump against
         self.level = None
 
-        self.genomeInputs = 6
-        self.genomeOutputs = 4
+        self.genomeInputs = 4
+        self.genomeOutputs = 3
         self.brain = NeuralNet(self.genomeInputs, self.genomeOutputs)
         self.vision = []
 
@@ -233,38 +233,38 @@ class Player(pygame.sprite.Sprite):
                     self.go_left()
                 elif i == 2:
                     self.jump()
-                elif i == 3:
-                    self.attack()
+                # elif i == 3:
+                #     self.attack()
 
     #Look around at the environment --> this is fed into the neural net
     def look(self): 
         self.vision = []
         # x difference between player and enemy
         x = (self.rect.x + 100) / 100
-        enemyx = (self.enemy.rect.x + 100) / 100
-        self.vision.append(x - enemyx)
+        # enemyx = (self.enemy.rect.x + 100) / 100
+        self.vision.append(x)
         # y difference between player and enemy
         y = (self.rect.y + 100) / 100
-        enemyy = (self.enemy.rect.y + 100) / 100
-        self.vision.append(y - enemyy)
+        # enemyy = (self.enemy.rect.y + 100) / 100
+        self.vision.append(y)
         # x difference in velocity
         vel = self.change_x
-        enemyvel = self.enemy.change_x
-        self.vision.append(vel - enemyvel)
+        # enemyvel = self.enemy.change_x
+        self.vision.append(vel)
         # distance to goal
         goalx = SCREEN_WIDTH - self.width
         x = ((goalx - self.rect.x) + 100) / 100
         self.vision.append(x)
         #player_is_attacking
-        if self.isAttacking:
-            self.vision.append(1)
-        else:
-            self.vision.append(0)
-        #enemy_is_attacking
-        if self.enemy.isAttacking:
-            self.vision.append(1)
-        else:
-            self.vision.append(0)
+        # if self.isAttacking:
+        #     self.vision.append(1)
+        # else:
+        #     self.vision.append(0)
+        # #enemy_is_attacking
+        # if self.enemy.isAttacking:
+        #     self.vision.append(1)
+        # else:
+        #     self.vision.append(0)
     
     # def setEnemy(self, enemy):
     #     if enemy == None:
@@ -290,23 +290,23 @@ class Player(pygame.sprite.Sprite):
     #             self.rect.x = self.startx
     #             self.rect.y = -self.height
 
-    # def calc_friction(self):
-    #     if self.change_x > 0:
-    #         self.change_x -= .2
-    #     if self.change_x < 0:
-    #         self.change_x += .2
+    def calc_friction(self):
+        if self.change_x > 0:
+            self.change_x -= .2
+        if self.change_x < 0:
+            self.change_x += .2
 
-    # def calc_grav(self):
-    #     """ Calculate effect of gravity. """
-    #     if self.change_y == 0:
-    #         self.change_y = 1
-    #     else:
-    #         self.change_y += .45
+    def calc_grav(self):
+        """ Calculate effect of gravity. """
+        if self.change_y == 0:
+            self.change_y = 1
+        else:
+            self.change_y += .45
  
-    #     # See if we are on the ground.
-    #     if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
-    #         self.change_y = 0
-    #         self.rect.y = SCREEN_HEIGHT - self.rect.height
+        # See if we are on the ground.
+        if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
+            self.change_y = 0
+            self.rect.y = SCREEN_HEIGHT - self.rect.height
     
     #The jumping action
     def jump(self):

@@ -83,14 +83,14 @@ class Level(object):
                 game.player.image = playerleft
             self.playerdirection = game.player.direction
         
-        if game.enemy.direction != self.enemydirection:
-            if game.enemy.direction == "right":
-                game.enemy.image = enemyright
-            else:
-                game.enemy.image = enemyleft
-            self.enemydirection = game.enemy.direction
+        # if game.enemy.direction != self.enemydirection:
+        #     if game.enemy.direction == "right":
+        #         game.enemy.image = enemyright
+        #     else:
+        #         game.enemy.image = enemyleft
+        #     self.enemydirection = game.enemy.direction
 
-        self.player_attack_list.draw(self.screen) 
+        # self.player_attack_list.draw(self.screen) 
         # self.enemy_attack_list.draw(self.screen) 
         self.platform_list.draw(self.screen)
         # self.enemy_list.draw(self.screen)
@@ -104,7 +104,7 @@ class Level(object):
         # If enemy has more kills, we profress towards their 'goal.'
         # If player has more goals, we progress towards their 'goal.'
         # Each entity has a set of 10 maps and one neutral ground.
-        currentMapIndex = (game.player.numGoals - game.enemy.numGoals) + 10
+        currentMapIndex = 0
         if currentMapIndex != self.currentmap:
             if currentMapIndex > 20:
                 currentMapIndex = 20
@@ -115,16 +115,16 @@ class Level(object):
         self.screen.blit(overlay, (0,0))
         
         #draw player stats
-        for hearts in range(game.player.numHearts):
-            self.screen.blit(heart,((game.player.startx + (hearts * 40)), 75))
-        for deaths in range(game.player.numDeaths):
-            self.screen.blit(death,((game.player.startx + ((deaths % 6) * 40)), (115 + (int(deaths/6)*40))))
+        # for hearts in range(game.player.numHearts):
+        #     self.screen.blit(heart,((game.player.startx + (hearts * 40)), 75))
+        # for deaths in range(game.player.numDeaths):
+        #     self.screen.blit(death,((game.player.startx + ((deaths % 6) * 40)), (115 + (int(deaths/6)*40))))
 
-        #draw enemy stats
-        for hearts in range(game.enemy.numHearts):
-            self.screen.blit(heart, ((game.enemy.startx -40 + (hearts * -40)), 75))
-        for deaths in range(game.player.numKills):
-            self.screen.blit(death,((game.enemy.startx - 40 + ((deaths % 6) * -40)), (115 + (int(deaths/6)*40))))
+        # #draw enemy stats
+        # for hearts in range(game.enemy.numHearts):
+        #     self.screen.blit(heart, ((game.enemy.startx -40 + (hearts * -40)), 75))
+        # for deaths in range(game.player.numKills):
+        #     self.screen.blit(death,((game.enemy.startx - 40 + ((deaths % 6) * -40)), (115 + (int(deaths/6)*40))))
 
 
 # Create platforms for the level
